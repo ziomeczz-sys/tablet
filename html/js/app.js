@@ -4,11 +4,30 @@ const lockScreen = document.getElementById('lockScreen');
 const setupScreen = document.getElementById('setupScreen');
 const homeScreen = document.getElementById('homeScreen');
 const contentArea = document.getElementById('contentArea');
+const mainGrid = document.getElementById('mainGrid');
 const modal = document.getElementById('modal');
 const modalTitle = document.getElementById('modalTitle');
 const modalBody = document.getElementById('modalBody');
 const modalCancel = document.getElementById('modalCancel');
 const modalConfirm = document.getElementById('modalConfirm');
+
+const permLabels = {
+  canHire: 'Przyjmowanie do organizacji',
+  canFire: 'Zwalnianie z organizacji',
+  canWarn: 'Wydawanie ostrzeżeń',
+  canStorage: 'Dostęp do magazynu',
+  canDeposit: 'Wpłata środków na saldo',
+  canWithdraw: 'Wypłata środków z salda',
+  canBonus: 'Wypłacanie premii',
+  canPromote: 'Zmiana rangi',
+  canManageRanks: 'Zarządzanie rangami',
+  canLicenses: 'Wydawanie licencji',
+  canGNews: 'Dostęp do /gnews',
+  canFunding: 'Zarządzanie finansowaniem',
+  canJail: 'Dostęp do wysyłania do więzienia',
+  canManageBlacklist: 'Zarządzanie czarną listą',
+  canDatabase: 'Dostęp do bazy danych',
+};
 
 let modalSubmit = null;
 
@@ -26,6 +45,12 @@ modalConfirm.onclick = async () => {
   if (modalSubmit) await modalSubmit();
   modal.classList.add('hidden');
 };
+
+function setFactionMode(enabled) {
+  if (!mainGrid) return;
+  if (enabled) mainGrid.classList.add('faction-mode');
+  else mainGrid.classList.remove('faction-mode');
+}
 
 function openLock() {
   app.classList.remove('hidden');
@@ -58,11 +83,12 @@ function openSetup() {
 }
 
 function openHome() {
+  setFactionMode(false);
   lockScreen.classList.add('hidden');
   setupScreen.classList.add('hidden');
   homeScreen.classList.remove('hidden');
   document.getElementById('identityText').textContent = `${state.identity.name || ''} • ${state.identity.rankLabel || ''}`;
-  contentArea.innerHTML = `<h3>Wybierz aplikację po lewej stronie</h3>`;
+  contentArea.innerHTML = `<h3>Wybierz aplikację</h3><p class="small">Czarne tło, białe napisy, mniejsze ikony i profesjonalny układ.</p>`;
 }
 
 async function loadFaction() {
@@ -74,6 +100,7 @@ async function loadFaction() {
   const resp = await TabletApi.rpc('factionDashboard');
   if (!resp.ok) return notify(resp.message || 'Błąd frakcji');
   state.faction = resp;
+  setFactionMode(true);
   renderFaction('members');
 }
 
@@ -86,7 +113,8 @@ function renderFaction(tab) {
   ];
 
   const tabHtml = tabs.map(([key, label]) => `<button class="tab-btn ${tab===key?'active':''}" data-tab="${key}">${label}</button>`).join('');
-  contentArea.innerHTML = `<div class="tabs">${tabHtml}</div><div id="tabContent"></div>`;
+  contentArea.innerHTML = `<div class="row" style="justify-content:space-between;margin-bottom:8px"><button class="btn ghost" id="backApps">← Aplikacje</button><div class="small">${f.me.name} • ${f.me.rank}</div></div><div class="tabs">${tabHtml}</div><div id="tabContent"></div>`;
+  document.getElementById('backApps').onclick = () => openHome();
   contentArea.querySelectorAll('.tab-btn').forEach(btn => btn.onclick = () => renderFaction(btn.dataset.tab));
 
   const box = document.getElementById('tabContent');
@@ -158,7 +186,7 @@ function renderFaction(tab) {
   }
 
   if (tab === 'bonus') box.innerHTML = '<h3>Premie</h3><p>Premie wydawane z salda przez panel członka.</p>';
-  if (tab === 'calls') box.innerHTML = '<h3>Wezwania</h3><p>Wersja 2026: moduł gotowy pod integrację dispatch.</p>';
+  if (tab === 'calls') box.innerHTML = '<h3>Wezwania</h3><p>Moduł gotowy pod integrację dispatch.</p>';
 
   if (tab === 'blacklist') {
     const rows = (f.blacklist || []).map(b => `<tr data-cid="${b.citizenid}"><td>${b.by}</td><td>${b.targetName || b.citizenid}</td><td>${b.reason}</td><td>${b.date}</td></tr>`).join('');
@@ -242,16 +270,49 @@ function openRankSettings(grade) {
   const rank = state.faction.ranks?.[grade];
   if (!rank) return;
   const perms = rank.permissions || {};
-  const permRows = Object.entries(perms).map(([key, value]) => `
-    <div class="toggle">
-      <span>${key}</span>
-      <input type="checkbox" ${value ? 'checked' : ''} disabled />
-    </div>
-  `).join('');
 
-  showModal(`Ranga ${rank.label}`, `<p>Wynagrodzenie za godzinę: <b>${rank.salaryPerHour} PLN</b></p><p>Uprawnienia (podgląd):</p>${permRows}`, async () => {
-    // Placeholder pod przyszły zapis perms/rang po stronie serwera.
+  const permRows = Object.keys(permLabels).map((key) => {
+    const value = !!perms[key];
+    return `<div class="toggle"><span>${permLabels[key]}</span><input type="checkbox" id="perm_${key}" ${value ? 'checked' : ''} /></div>`;
+  }).join('');
+
+  showModal(`Ranga ${rank.label}`, `
+    <label>Nazwa rangi</label>
+    <input id="rankName" value="${rank.label}" />
+    <label>Wynagrodzenie za godzinę (max 10000)</label>
+    <div class="range-wrap">
+      <input id="salaryRange" type="range" min="0" max="10000" step="100" value="${Math.min(Number(rank.salaryPerHour || 0), 10000)}" />
+      <input id="salaryValue" type="number" min="0" max="10000" step="100" value="${Math.min(Number(rank.salaryPerHour || 0), 10000)}" style="width:120px" />
+    </div>
+    <div class="small">Maksymalna kwota: 10000 PLN / godzinę</div>
+    <hr style="border-color:#222" />
+    ${permRows}
+  `, async () => {
+    const salary = Math.min(10000, Math.max(0, Number(document.getElementById('salaryValue').value || 0)));
+    const updatedPerms = {};
+    Object.keys(permLabels).forEach((key) => {
+      updatedPerms[key] = !!document.getElementById(`perm_${key}`)?.checked;
+    });
+
+    await TabletApi.rpc('factionAction', {
+      action: 'rank_update',
+      gradeLevel: Number(grade),
+      label: document.getElementById('rankName').value,
+      salaryPerHour: salary,
+      permissions: updatedPerms,
+    });
+
+    await loadFaction();
   });
+
+  const salaryRange = document.getElementById('salaryRange');
+  const salaryValue = document.getElementById('salaryValue');
+  salaryRange.oninput = () => salaryValue.value = salaryRange.value;
+  salaryValue.oninput = () => {
+    const v = Math.min(10000, Math.max(0, Number(salaryValue.value || 0)));
+    salaryValue.value = v;
+    salaryRange.value = v;
+  };
 }
 
 function balanceModal(action, title) {
@@ -262,6 +323,7 @@ function balanceModal(action, title) {
 }
 
 function openFamily() {
+  setFactionMode(false);
   contentArea.innerHTML = Views.family(state);
   const btn = document.getElementById('familyCreate');
   if (btn) {

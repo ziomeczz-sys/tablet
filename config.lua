@@ -47,7 +47,7 @@ Config.DefaultRanks = {
         }
     },
     [2] = {
-        id = 'leader', label = 'Leader', salaryPerHour = 1500,
+        id = 'sergant', label = 'Sergant', salaryPerHour = 1500,
         permissions = {
             canHire = true, canFire = true, canWarn = true, canStorage = true,
             canDeposit = true, canWithdraw = true, canBonus = true, canPromote = true,

@@ -1,39 +1,52 @@
 :root {
-  --bg1: #091426;
-  --bg2: #112245;
-  --accent: #4ec3ff;
-  --accent2: #6f7bff;
-  --ok: #2ecc71;
-  --muted: #94a3b8;
-  --danger: #f56565;
+  --bg0: #000;
+  --bg1: #0a0a0a;
+  --bg2: #111;
+  --panel: #141414;
+  --line: #242424;
+  --text: #ffffff;
+  --muted: #a3a3a3;
+  --accent: #2b7fff;
+  --danger: #ff4d4f;
+  --ok: #18c964;
 }
+
 * { box-sizing: border-box; }
+
 body {
   margin: 0;
   font-family: Inter, -apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif;
-  background: radial-gradient(circle at 20% 20%, #1c3f83, #0d1426 60%);
-  color: #f1f5f9;
+  background: #000;
+  color: var(--text);
   overflow: hidden;
 }
+
 .hidden { display: none !important; }
+
 .btn {
-  border: 0;
-  border-radius: 12px;
-  padding: 10px 14px;
-  color: white;
-  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  border: 1px solid #303030;
+  border-radius: 10px;
+  padding: 8px 12px;
+  color: #fff;
+  background: #1b1b1b;
   cursor: pointer;
 }
-.btn.ghost { background: rgba(255,255,255,0.12); }
-.btn.danger { background: linear-gradient(135deg, #ff7b7b, #c53030); }
+
+.btn:hover { background: #222; }
+.btn.primary { background: var(--accent); border-color: #1c61c4; }
+.btn.ghost { background: #121212; }
+.btn.danger { background: #2a1111; border-color: #4d1b1b; color: #ffb1b1; }
+
 input, select, textarea {
   width: 100%;
-  margin-bottom: 10px;
+  margin-bottom: 8px;
   border-radius: 10px;
-  border: 1px solid rgba(255,255,255,.2);
-  background: rgba(2,6,23,.45);
+  border: 1px solid #2f2f2f;
+  background: #0f0f0f;
   color: #fff;
-  padding: 10px;
+  padding: 9px;
 }
+
 .row { display: flex; gap: 8px; }
 .row.end { justify-content: flex-end; }
+.small { font-size: 12px; color: var(--muted); }

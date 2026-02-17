@@ -187,6 +187,34 @@ QBTablet.QBCore.Functions.CreateCallback('qb-tablet:server:factionAction', funct
         QBTablet.FactionService.log(actor, 'ARREST', ('miesiące:%s'):format(payload.months or 0), 5000)
         QBTablet.TabletService.savePersistentState()
         return cb({ ok = true, balance = QBTablet.State.faction.balance })
+    elseif action == 'rank_update' then
+        local gradeLevel = tonumber(payload.gradeLevel)
+        if gradeLevel == nil then return cb({ ok = false, message = 'Brak stopnia' }) end
+
+        local actorPerms = QBTablet.FactionService.getPlayerPermissions(Player)
+        if not actorPerms.canManageRanks then return cb({ ok = false, message = 'Brak uprawnień do rang' }) end
+
+        local current = QBTablet.State.faction.ranks[gradeLevel] or {}
+        local rankLabel = tostring(payload.label or current.label or ('Ranga ' .. gradeLevel))
+        local salary = tonumber(payload.salaryPerHour) or (current.salaryPerHour or 0)
+        salary = math.min(10000, math.max(0, math.floor(salary)))
+
+        local permissions = {}
+        local provided = payload.permissions or {}
+        for _, permKey in ipairs(Config.PermissionKeys) do
+            permissions[permKey] = provided[permKey] == true
+        end
+
+        QBTablet.State.faction.ranks[gradeLevel] = {
+            id = current.id or ('grade_' .. gradeLevel),
+            label = rankLabel,
+            salaryPerHour = salary,
+            permissions = permissions
+        }
+
+        QBTablet.FactionService.log(actor, 'RANK_UPDATE', ('grade:%s'):format(gradeLevel), salary)
+        QBTablet.TabletService.savePersistentState()
+        return cb({ ok = true, rank = QBTablet.State.faction.ranks[gradeLevel] })
     elseif action == 'spawn_transport' then
         local vehicle = nil
         for _, row in ipairs(Config.TransportCatalog) do
