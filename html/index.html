@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>QBCore Tablet</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div id="tablet" class="hidden">
+    <div id="lockScreen" class="screen"></div>
+    <div id="setupScreen" class="screen hidden"></div>
+    <div id="homeScreen" class="screen hidden">
+      <header><h2>Tablet</h2><button id="closeBtn">✕</button></header>
+      <div class="apps">
+        <button id="appFaction">Moja Frakcja</button>
+        <button id="appFamily">Moja Rodzina</button>
+      </div>
+      <section id="content"></section>
+    </div>
+  </div>
+  <script src="app.js"></script>
+</body>
+</html>
