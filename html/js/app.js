@@ -31,6 +31,16 @@ const permLabels = {
 
 let modalSubmit = null;
 
+
+window.onerror = function(message, source, lineno, colno) {
+  app.classList.remove('hidden');
+  lockScreen.classList.remove('hidden');
+  setupScreen.classList.add('hidden');
+  homeScreen.classList.add('hidden');
+  lockScreen.innerHTML = `<div class="pin-card"><h3>Błąd UI tabletu</h3><p class="small">${String(message)} (${lineno}:${colno})</p></div>`;
+  return false;
+};
+
 function notify(msg) { console.log('[tablet]', msg); }
 
 function showModal(title, bodyHtml, onConfirm) {
@@ -349,5 +359,9 @@ window.addEventListener('message', (event) => {
     Object.assign(state, data.payload || {});
     if (!state.configured) openSetup(); else openLock();
   }
-  if (data.action === 'tablet:close') app.classList.add('hidden');
+  if (data.action === 'tablet:close') {
+    app.classList.add('hidden');
+    setFactionMode(false);
+    modal.classList.add('hidden');
+  }
 });
