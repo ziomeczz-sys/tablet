@@ -190,9 +190,13 @@ function renderFaction(tab) {
   }
 
   if (tab === 'settings') {
-    const rankRows = Object.entries(f.ranks).map(([grade, rank]) => `<tr><td>${grade}</td><td>${rank.label}</td><td>${rank.salaryPerHour} PLN/h</td><td><button class="btn" data-grade="${grade}">Edytuj</button></td></tr>`).join('');
-    box.innerHTML = `<h3>Ustawienia</h3><div class="tabs"><button class="tab-btn active">Rangi</button><button class="tab-btn">Przedmioty</button></div><table class="table"><thead><tr><th>Stopień</th><th>Nazwa rangi</th><th>Wynagrodzenie</th><th>Opcje</th></tr></thead><tbody>${rankRows}</tbody></table>`;
+    const rankRows = Object.entries(f.ranks)
+      .sort((a,b) => Number(a[0]) - Number(b[0]))
+      .map(([grade, rank]) => `<tr><td>${grade}</td><td>${rank.label}</td><td>${rank.salaryPerHour} PLN/h</td><td><button class="btn" data-grade="${grade}">Edytuj</button></td></tr>`).join('');
+    box.innerHTML = `<h3>Ustawienia</h3><div class="tabs"><button class="tab-btn active">Rangi</button><button class="tab-btn">Przedmioty</button></div><div class="row" style="margin-bottom:8px"><button class="btn" id="createRankBtn">+ Utwórz rangę</button></div><table class="table"><thead><tr><th>Stopień</th><th>Nazwa rangi</th><th>Wynagrodzenie</th><th>Opcje</th></tr></thead><tbody>${rankRows}</tbody></table>`;
     box.querySelectorAll('button[data-grade]').forEach(btn => btn.onclick = () => openRankSettings(btn.dataset.grade));
+    const createBtn = document.getElementById('createRankBtn');
+    if (createBtn) createBtn.onclick = () => openCreateRankModal();
   }
 
   if (tab === 'bonus') box.innerHTML = '<h3>Premie</h3><p>Premie wydawane z salda przez panel członka.</p>';
@@ -272,6 +276,26 @@ function rankChangeModal(action, title, citizenid) {
   const options = Object.entries(state.faction.ranks).map(([k, rank]) => `<option value="${k}">${k} ${rank.label}</option>`).join('');
   showModal(title, `<label>${title}:</label><select id="targetRank">${options}</select><textarea id="rankReason" placeholder="Powód"></textarea>`, async () => {
     await TabletApi.rpc('factionAction', { action, citizenid, gradeLevel: Number(document.getElementById('targetRank').value), reason: document.getElementById('rankReason').value });
+    await loadFaction();
+  });
+}
+
+
+function openCreateRankModal() {
+  showModal('Utwórz rangę', `
+    <label>Stopień (liczba)</label>
+    <input id="newRankGrade" type="number" min="0" step="1" placeholder="np. 3" />
+    <label>Nazwa rangi</label>
+    <input id="newRankLabel" placeholder="np. Inspektor" />
+    <label>Wynagrodzenie / godzina (max 10000)</label>
+    <input id="newRankSalary" type="number" min="0" max="10000" step="100" value="0" />
+  `, async () => {
+    await TabletApi.rpc('factionAction', {
+      action: 'rank_create',
+      gradeLevel: Number(document.getElementById('newRankGrade').value),
+      label: document.getElementById('newRankLabel').value,
+      salaryPerHour: Number(document.getElementById('newRankSalary').value),
+    });
     await loadFaction();
   });
 }

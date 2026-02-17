@@ -14,3 +14,13 @@ CREATE TABLE IF NOT EXISTS tablet_faction_logs (
     amount INT NOT NULL DEFAULT 0,
     created_at DATETIME NOT NULL
 );
+
+
+CREATE TABLE IF NOT EXISTS tablet_faction_ranks (
+    grade_level INT PRIMARY KEY,
+    rank_id VARCHAR(64) NOT NULL,
+    label VARCHAR(128) NOT NULL,
+    salary_per_hour INT NOT NULL DEFAULT 0,
+    permissions_json LONGTEXT NOT NULL,
+    updated_at DATETIME NOT NULL
+);

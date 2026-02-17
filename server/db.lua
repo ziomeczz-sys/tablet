@@ -22,3 +22,8 @@ function QBTablet.DB.execute(query, params, cb)
     if not hasOxmysql() then if cb then cb(0) end return end
     exports.oxmysql:execute(query, params or {}, cb)
 end
+
+
+function QBTablet.DB.isEnabled()
+    return hasOxmysql()
+end

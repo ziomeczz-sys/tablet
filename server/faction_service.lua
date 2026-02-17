@@ -18,6 +18,38 @@ local function actorOf(Player)
     }
 end
 
+
+function QBTablet.FactionService.persistRankToDb(gradeLevel, rank)
+    if not QBTablet.DB.isEnabled() then return end
+    QBTablet.DB.execute('INSERT INTO tablet_faction_ranks (grade_level, rank_id, label, salary_per_hour, permissions_json, updated_at) VALUES (?, ?, ?, ?, ?, NOW()) ON DUPLICATE KEY UPDATE rank_id = VALUES(rank_id), label = VALUES(label), salary_per_hour = VALUES(salary_per_hour), permissions_json = VALUES(permissions_json), updated_at = NOW()', {
+        gradeLevel,
+        tostring(rank.id or ('grade_' .. gradeLevel)),
+        tostring(rank.label or ('Ranga ' .. gradeLevel)),
+        tonumber(rank.salaryPerHour) or 0,
+        json.encode(rank.permissions or {})
+    })
+end
+
+function QBTablet.FactionService.loadRanksFromDb()
+    if not QBTablet.DB.isEnabled() then return end
+    QBTablet.DB.fetchAll('SELECT grade_level, rank_id, label, salary_per_hour, permissions_json FROM tablet_faction_ranks', {}, function(rows)
+        if type(rows) ~= 'table' then return end
+        for _, row in ipairs(rows) do
+            local perms = {}
+            if row.permissions_json and row.permissions_json ~= '' then
+                perms = json.decode(row.permissions_json) or {}
+            end
+            QBTablet.State.faction.ranks[tonumber(row.grade_level)] = {
+                id = row.rank_id,
+                label = row.label,
+                salaryPerHour = tonumber(row.salary_per_hour) or 0,
+                permissions = perms
+            }
+        end
+        QBTablet.TabletService.savePersistentState()
+    end)
+end
+
 function QBTablet.FactionService.getPlayerPermissions(Player)
     local grade = (Player.PlayerData.job and Player.PlayerData.job.grade and Player.PlayerData.job.grade.level) or 0
     local rank = QBTablet.State.faction.ranks[grade] or Config.DefaultRanks[grade] or Config.DefaultRanks[0]
@@ -187,6 +219,36 @@ QBTablet.QBCore.Functions.CreateCallback('qb-tablet:server:factionAction', funct
         QBTablet.FactionService.log(actor, 'ARREST', ('miesiące:%s'):format(payload.months or 0), 5000)
         QBTablet.TabletService.savePersistentState()
         return cb({ ok = true, balance = QBTablet.State.faction.balance })
+    elseif action == 'rank_create' then
+        local gradeLevel = tonumber(payload.gradeLevel)
+        if gradeLevel == nil then return cb({ ok = false, message = 'Brak stopnia' }) end
+
+        local actorPerms = QBTablet.FactionService.getPlayerPermissions(Player)
+        if not actorPerms.canManageRanks then return cb({ ok = false, message = 'Brak uprawnień do rang' }) end
+
+        if QBTablet.State.faction.ranks[gradeLevel] then
+            return cb({ ok = false, message = 'Ten stopień już istnieje' })
+        end
+
+        local salary = tonumber(payload.salaryPerHour) or 0
+        salary = math.min(10000, math.max(0, math.floor(salary)))
+
+        local defaultPerms = {}
+        for _, permKey in ipairs(Config.PermissionKeys) do
+            defaultPerms[permKey] = false
+        end
+
+        QBTablet.State.faction.ranks[gradeLevel] = {
+            id = ('grade_' .. gradeLevel),
+            label = tostring(payload.label or ('Ranga ' .. gradeLevel)),
+            salaryPerHour = salary,
+            permissions = defaultPerms
+        }
+
+        QBTablet.FactionService.persistRankToDb(gradeLevel, QBTablet.State.faction.ranks[gradeLevel])
+        QBTablet.FactionService.log(actor, 'RANK_CREATE', ('grade:%s'):format(gradeLevel), salary)
+        QBTablet.TabletService.savePersistentState()
+        return cb({ ok = true, rank = QBTablet.State.faction.ranks[gradeLevel] })
     elseif action == 'rank_update' then
         local gradeLevel = tonumber(payload.gradeLevel)
         if gradeLevel == nil then return cb({ ok = false, message = 'Brak stopnia' }) end
@@ -212,6 +274,7 @@ QBTablet.QBCore.Functions.CreateCallback('qb-tablet:server:factionAction', funct
             permissions = permissions
         }
 
+        QBTablet.FactionService.persistRankToDb(gradeLevel, QBTablet.State.faction.ranks[gradeLevel])
         QBTablet.FactionService.log(actor, 'RANK_UPDATE', ('grade:%s'):format(gradeLevel), salary)
         QBTablet.TabletService.savePersistentState()
         return cb({ ok = true, rank = QBTablet.State.faction.ranks[gradeLevel] })

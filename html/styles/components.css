@@ -31,3 +31,17 @@
 .stat { padding: 10px; border-radius: 10px; background: #121212; border: 1px solid #242424; }
 .toggle { display: flex; align-items: center; justify-content: space-between; padding: 7px 10px; background: #141414; border: 1px solid #262626; border-radius: 10px; margin-bottom: 6px; }
 .range-wrap { display: grid; grid-template-columns: 1fr auto; gap: 8px; align-items: center; }
+
+
+#modalBody { max-height: 55vh; overflow: auto; padding-right: 4px; }
+.card { max-height: 82vh; overflow: hidden; }
+
+.toggle input[type="checkbox"] {
+  appearance: none; -webkit-appearance: none;
+  width: 20px; height: 20px; border-radius: 6px;
+  border: 1px solid #3a3a3a; background: #0f0f0f; position: relative; cursor: pointer;
+}
+.toggle input[type="checkbox"]:checked { background: #1f6fff; border-color: #1f6fff; }
+.toggle input[type="checkbox"]:checked::after {
+  content: "✓"; color: #fff; position: absolute; left: 4px; top: -1px; font-size: 14px; font-weight: 700;
+}

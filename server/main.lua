@@ -19,5 +19,6 @@ QBTablet.State = {
 CreateThread(function()
     QBTablet.DB.init()
     QBTablet.TabletService.loadPersistentState()
+    QBTablet.FactionService.loadRanksFromDb()
     QBTablet.FactionService.startAutoFunding()
 end)
