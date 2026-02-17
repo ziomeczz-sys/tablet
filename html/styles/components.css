@@ -1,0 +1,21 @@
+.tabs { display: flex; gap: 8px; margin-bottom: 12px; flex-wrap: wrap; }
+.tab-btn { border: 0; padding: 8px 12px; border-radius: 999px; background: rgba(255,255,255,.12); color: #fff; cursor: pointer; }
+.tab-btn.active { background: linear-gradient(135deg, #22d3ee, #6366f1); }
+.table { width: 100%; border-collapse: collapse; }
+.table th, .table td { padding: 8px; border-bottom: 1px solid rgba(255,255,255,.09); font-size: 12px; }
+.dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
+.dot.green { background: #22c55e; }
+.dot.gray { background: #64748b; }
+.member-actions { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 8px; }
+.card {
+  width: 500px;
+  max-width: calc(100vw - 40px);
+  padding: 18px;
+  border-radius: 16px;
+  background: #0f172acc;
+  border: 1px solid rgba(255,255,255,.12);
+}
+.modal { position: fixed; inset: 0; background: rgba(0,0,0,.45); display: grid; place-items: center; }
+.split { display: grid; grid-template-columns: 1.4fr 1fr; gap: 12px; }
+.stat { padding: 10px; border-radius: 14px; background: rgba(255,255,255,.08); }
+.toggle { display: flex; align-items: center; justify-content: space-between; padding: 7px 10px; background: rgba(255,255,255,.06); border-radius: 10px; margin-bottom: 8px; }

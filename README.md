@@ -1,46 +1,70 @@
-# qb-tablet-ios (QBCore)
+# qb-tablet-pro
 
-Prototyp tabletu pod FiveM/QBCore z:
+Profesjonalny tablet pod QBCore/FiveM (styl iPad 2026):
 
-- ekranem blokady w stylu iOS (NUI),
-- pierwszą konfiguracją (język PL/EN + PIN),
-- aplikacją **Moja Frakcja**,
-- aplikacją **Moja Rodzina**,
-- podstawowym zarządzaniem saldem frakcji i logami,
-- komendą leadera `/lealspd ID`,
-- komendą ogłoszeń `/gnews ...`.
+- duży, kolorowy interfejs NUI,
+- ekran blokady + pierwszy setup (PL/EN i PIN),
+- aplikacje: **Moja Frakcja** i **Moja Rodzina**,
+- pełny panel zakładek we **Frakcji**:
+  - Członkowie,
+  - Baza Danych,
+  - Magazyn,
+  - Zarządzanie saldem,
+  - Dostawa transportu,
+  - Ustawienia,
+  - Premie,
+  - Wezwania,
+  - Czarna Lista,
+- modalne akcje członka:
+  - Awansuj / Degraduj,
+  - Wydaj WARN / Zdejmij WARN,
+  - Zwolnij (z opcją blacklisty),
+  - Wydaj premię,
+  - Uwięź (zasilenie salda +5000),
+- auto-zasilanie salda frakcji co 30 min,
+- komendy:
+  - `/tablet`
+  - `/lealspd ID`
+  - `/gnews treść` (niebieski globalny komunikat),
+- baza danych: SQL schema + warstwa `oxmysql` (fallback JSON gdy brak DB).
+
+## Struktura projektu
+
+- `client/`
+  - `main.lua`
+  - `nui.lua`
+- `server/`
+  - `main.lua`
+  - `db.lua`
+  - `tablet_service.lua`
+  - `faction_service.lua`
+  - `commands.lua`
+- `html/`
+  - `index.html`
+  - `styles/`
+  - `js/`
+- `shared/`
+  - `constants.lua`
+  - `locales/`
+- `sql/tablet.sql`
 
 ## Instalacja
 
-1. Wrzuć resource do `resources/[qb]/qb-tablet-ios`.
-2. Dodaj do `server.cfg`:
+1. Skopiuj resource do `resources/[qb]/qb-tablet-pro`.
+2. (Opcjonalnie) uruchom SQL z pliku `sql/tablet.sql`.
+3. Dodaj do `server.cfg`:
    ```cfg
-   ensure qb-tablet-ios
+   ensure qb-tablet-pro
    ```
-3. Otwórz tablet komendą:
-   ```
-   /tablet
-   ```
-
-## Co jest gotowe
-
-- Setup dla nowego gracza (język + PIN zapisane w metadata gracza).
-- Blokada PIN przy każdym otwarciu.
-- Aplikacja rodziny (utworzenie nazwy rodziny).
-- Aplikacja frakcji (dla jobów `police` / `lspd`) z listą członków online.
-- Podstawowe operacje salda frakcji: wpłata/wypłata + logi.
-- Auto-wpłata na saldo co 30 min (`15000 PLN`) + log "Urząd Miasta".
-- Warny i czarna lista po stronie serwera (callback API).
 
 ## Konfiguracja
 
-W pliku `config.lua`:
+Edytuj `config.lua`:
+- joby frakcyjne,
+- pojazdy transportu,
+- auto-income,
+- domyślne rangi i permisje.
 
-- `Config.FactionJobs` – jakie joby mają dostęp do "Moja Frakcja",
-- `Config.FactionAutoIncomeMs`, `Config.FactionAutoIncomeAmount`,
-- `Config.TransportPoints` – punkty dostawy aut,
-- `Config.DefaultRankPermissions` – domyślne uprawnienia rang.
+## Uwagi
 
-## Uwaga
-
-To jest **działający szkielet MVP** pod dalszą rozbudowę ekranów i flow (szczególnie szczegółowe widoki członków, baza danych obywateli, mandaty, aresztowania, pełny system rang/permisji UI).
+To jest duży krok względem poprzedniej wersji MVP: rozbita architektura, nowy wygląd iPad, więcej zakładek, więcej realnych akcji i podpięcie pod DB/fallback.

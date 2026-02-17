@@ -1,0 +1,49 @@
+#app { width: 100vw; height: 100vh; display: grid; place-items: center; }
+.tablet-shell {
+  width: 1220px;
+  height: 780px;
+  border-radius: 46px;
+  padding: 18px;
+  background: linear-gradient(145deg, #16181e, #080b13);
+  box-shadow: 0 20px 80px rgba(0,0,0,.55), inset 0 0 0 2px #2b2f3a;
+  position: relative;
+}
+.tablet-camera {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #0a0a0a;
+  border: 1px solid #2f3b4c;
+  position: absolute;
+  top: 8px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+.tablet-screen {
+  width: 100%;
+  height: 100%;
+  border-radius: 34px;
+  overflow: hidden;
+  background: linear-gradient(160deg, #193a75, #0d1a33 65%, #060a14);
+}
+.view { width: 100%; height: 100%; padding: 24px; }
+#lockScreen { display: grid; place-items: center; text-align: center; }
+.pin-card { width: 420px; padding: 24px; border-radius: 24px; background: rgba(15,23,42,.65); backdrop-filter: blur(10px); }
+.main-grid { height: calc(100% - 70px); display: grid; grid-template-columns: 280px 1fr; gap: 18px; }
+.app-grid { display: grid; grid-template-columns: 1fr; gap: 14px; }
+.app-btn {
+  text-align: left;
+  border: 0;
+  border-radius: 18px;
+  padding: 18px;
+  color: #fff;
+  background: linear-gradient(145deg, rgba(56,189,248,.35), rgba(99,102,241,.35));
+}
+.content {
+  background: rgba(2,6,23,.45);
+  border: 1px solid rgba(255,255,255,.09);
+  border-radius: 20px;
+  padding: 14px;
+  overflow: auto;
+}
+.topbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
