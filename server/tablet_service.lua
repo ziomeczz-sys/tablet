@@ -25,7 +25,7 @@ function QBTablet.TabletService.savePersistentState()
     SaveResourceFile(GetCurrentResourceName(), DATA_FILE, json.encode(QBTablet.State), -1)
 end
 
-QBCore.Functions.CreateCallback('qb-tablet:server:getBootstrap', function(source, cb)
+QBTablet.QBCore.Functions.CreateCallback('qb-tablet:server:getBootstrap', function(source, cb)
     local Player = QBTablet.QBCore.Functions.GetPlayer(source)
     if not Player then return cb({ configured = false }) end
     local tmd = Player.PlayerData.metadata.tablet or {}
@@ -46,7 +46,7 @@ QBCore.Functions.CreateCallback('qb-tablet:server:getBootstrap', function(source
     })
 end)
 
-QBCore.Functions.CreateCallback('qb-tablet:server:setup', function(source, cb, payload)
+QBTablet.QBCore.Functions.CreateCallback('qb-tablet:server:setup', function(source, cb, payload)
     local Player = QBTablet.QBCore.Functions.GetPlayer(source)
     if not Player then return cb({ ok = false, message = 'No player' }) end
     if type(payload) ~= 'table' or not payload.pin or not payload.language then return cb({ ok = false, message = 'Bad payload' }) end
@@ -61,14 +61,14 @@ QBCore.Functions.CreateCallback('qb-tablet:server:setup', function(source, cb, p
     cb({ ok = true })
 end)
 
-QBCore.Functions.CreateCallback('qb-tablet:server:unlock', function(source, cb, payload)
+QBTablet.QBCore.Functions.CreateCallback('qb-tablet:server:unlock', function(source, cb, payload)
     local Player = QBTablet.QBCore.Functions.GetPlayer(source)
     if not Player then return cb({ ok = false }) end
     local md = Player.PlayerData.metadata.tablet or {}
     cb({ ok = tostring(md.pin or '') == tostring(payload.pin or '') })
 end)
 
-QBCore.Functions.CreateCallback('qb-tablet:server:createFamily', function(source, cb, payload)
+QBTablet.QBCore.Functions.CreateCallback('qb-tablet:server:createFamily', function(source, cb, payload)
     local Player = QBTablet.QBCore.Functions.GetPlayer(source)
     if not Player then return cb({ ok = false }) end
     local name = (payload and payload.name or ''):gsub('^%s+', ''):gsub('%s+$', '')

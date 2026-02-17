@@ -51,7 +51,7 @@ function QBTablet.FactionService.startAutoFunding()
     end)
 end
 
-QBCore.Functions.CreateCallback('qb-tablet:server:factionDashboard', function(source, cb)
+QBTablet.QBCore.Functions.CreateCallback('qb-tablet:server:factionDashboard', function(source, cb)
     local Player = QBTablet.QBCore.Functions.GetPlayer(source)
     if not isFaction(Player) then return cb({ ok = false, message = Lang:t('ui.not_in_faction') }) end
 
@@ -90,7 +90,7 @@ QBCore.Functions.CreateCallback('qb-tablet:server:factionDashboard', function(so
     })
 end)
 
-QBCore.Functions.CreateCallback('qb-tablet:server:factionAction', function(source, cb, payload)
+QBTablet.QBCore.Functions.CreateCallback('qb-tablet:server:factionAction', function(source, cb, payload)
     local Player = QBTablet.QBCore.Functions.GetPlayer(source)
     if not isFaction(Player) then return cb({ ok = false, message = 'Brak dostępu' }) end
     local action = payload and payload.action
