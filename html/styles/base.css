@@ -16,7 +16,7 @@
 body {
   margin: 0;
   font-family: Inter, -apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif;
-  background: #000;
+  background: transparent;
   color: var(--text);
   overflow: hidden;
 }

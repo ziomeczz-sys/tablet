@@ -267,7 +267,7 @@ function rankChangeModal(action, title, citizenid) {
 }
 
 function openRankSettings(grade) {
-  const rank = state.faction.ranks?.[grade];
+  const rank = state.faction && state.faction.ranks && state.faction.ranks[grade];
   if (!rank) return;
   const perms = rank.permissions || {};
 
@@ -291,7 +291,8 @@ function openRankSettings(grade) {
     const salary = Math.min(10000, Math.max(0, Number(document.getElementById('salaryValue').value || 0)));
     const updatedPerms = {};
     Object.keys(permLabels).forEach((key) => {
-      updatedPerms[key] = !!document.getElementById(`perm_${key}`)?.checked;
+      const el = document.getElementById(`perm_${key}`);
+      updatedPerms[key] = !!(el && el.checked);
     });
 
     await TabletApi.rpc('factionAction', {
