@@ -33,3 +33,10 @@ RegisterNetEvent('qb-tablet:client:transportBlip', function(payload)
     AddTextComponentString('Dostawa transportu')
     EndTextCommandSetBlipName(blip)
 end)
+
+
+RegisterCommand('tabletkey', function()
+    Tablet:open()
+end, false)
+
+RegisterKeyMapping('tabletkey', 'Otwórz tablet', 'keyboard', '5')

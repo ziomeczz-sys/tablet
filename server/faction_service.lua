@@ -127,6 +127,7 @@ QBTablet.QBCore.Functions.CreateCallback('qb-tablet:server:factionAction', funct
     if not isFaction(Player) then return cb({ ok = false, message = 'Brak dostępu' }) end
     local action = payload and payload.action
     local actor = actorOf(Player)
+    local actorPerms = QBTablet.FactionService.getPlayerPermissions(Player)
 
     if action == 'deposit' then
         local amount = tonumber(payload.amount) or 0
@@ -177,10 +178,21 @@ QBTablet.QBCore.Functions.CreateCallback('qb-tablet:server:factionAction', funct
         QBTablet.TabletService.savePersistentState()
         return cb({ ok = true })
     elseif action == 'member_promote' or action == 'member_demote' then
+        if not actorPerms.canPromote then return cb({ ok = false, message = 'Brak uprawnień do zmiany rangi' }) end
+        if payload.citizenid == Player.PlayerData.citizenid then
+            return cb({ ok = false, message = 'Nie możesz zmieniać swojej własnej rangi w tablecie' })
+        end
+
         local target = QBTablet.QBCore.Functions.GetPlayerByCitizenId(payload.citizenid)
         if not target then return cb({ ok = false, message = 'Gracz offline' }) end
         local level = tonumber(payload.gradeLevel)
         if level == nil then return cb({ ok = false, message = 'Brak rangi' }) end
+
+        local myLevel = (Player.PlayerData.job and Player.PlayerData.job.grade and Player.PlayerData.job.grade.level) or 0
+        if level >= myLevel then
+            return cb({ ok = false, message = 'Możesz ustawić tylko rangę niższą od swojej' })
+        end
+
         target.Functions.SetJob(target.PlayerData.job.name, level)
         QBTablet.FactionService.log(actor, action == 'member_promote' and 'PROMOTE' or 'DEMOTE', payload.reason, 0)
         return cb({ ok = true })
@@ -223,7 +235,6 @@ QBTablet.QBCore.Functions.CreateCallback('qb-tablet:server:factionAction', funct
         local gradeLevel = tonumber(payload.gradeLevel)
         if gradeLevel == nil then return cb({ ok = false, message = 'Brak stopnia' }) end
 
-        local actorPerms = QBTablet.FactionService.getPlayerPermissions(Player)
         if not actorPerms.canManageRanks then return cb({ ok = false, message = 'Brak uprawnień do rang' }) end
 
         if QBTablet.State.faction.ranks[gradeLevel] then
@@ -253,7 +264,6 @@ QBTablet.QBCore.Functions.CreateCallback('qb-tablet:server:factionAction', funct
         local gradeLevel = tonumber(payload.gradeLevel)
         if gradeLevel == nil then return cb({ ok = false, message = 'Brak stopnia' }) end
 
-        local actorPerms = QBTablet.FactionService.getPlayerPermissions(Player)
         if not actorPerms.canManageRanks then return cb({ ok = false, message = 'Brak uprawnień do rang' }) end
 
         local current = QBTablet.State.faction.ranks[gradeLevel] or {}

@@ -223,12 +223,18 @@ function renderFaction(tab) {
 function openMemberDetails(citizenid) {
   const m = state.faction.members.find(x => x.citizenid === citizenid);
   if (!m) return;
+  const perms = (state.faction && state.faction.permissions) || {};
+  const isSelf = state.identity && state.identity.citizenid === m.citizenid;
+  const canPromote = !!perms.canPromote && !isSelf;
+  const dis = (ok) => ok ? '' : 'disabled';
+
   contentArea.innerHTML = `<button class="btn ghost" id="backToMembers">← Wróć</button>
     <h3>${m.name}</h3>
     <p>ID: ${m.source} | Ranga: ${m.rank} | Warny: ${m.warns || 0} | Dziś h: ${m.todayHours || 0} | Przyjął do org: ${m.hiredBy || 'Brak'}</p>
+    ${isSelf ? '<p class="small">Nie możesz zmieniać własnej rangi przez tablet.</p>' : ''}
     <div class="member-actions">
-      <button class="btn" id="promoteBtn">Awansuj</button>
-      <button class="btn" id="demoteBtn">Degraduj</button>
+      <button class="btn" id="promoteBtn" ${dis(canPromote)}>Awansuj</button>
+      <button class="btn" id="demoteBtn" ${dis(canPromote)}>Degraduj</button>
       <button class="btn" id="warnAddBtn">Wydaj WARN</button>
       <button class="btn" id="warnRmBtn">Zdejmij WARN</button>
       <button class="btn danger" id="fireBtn">Zwolnij</button>
@@ -237,8 +243,10 @@ function openMemberDetails(citizenid) {
     </div>`;
   document.getElementById('backToMembers').onclick = () => renderFaction('members');
 
-  document.getElementById('promoteBtn').onclick = () => rankChangeModal('member_promote', 'Awansuj na rangę', m.citizenid);
-  document.getElementById('demoteBtn').onclick = () => rankChangeModal('member_demote', 'Degraduj na rangę', m.citizenid);
+  if (canPromote) {
+    document.getElementById('promoteBtn').onclick = () => rankChangeModal('member_promote', 'Awansuj na rangę', m.citizenid);
+    document.getElementById('demoteBtn').onclick = () => rankChangeModal('member_demote', 'Degraduj na rangę', m.citizenid);
+  }
 
   document.getElementById('warnAddBtn').onclick = () => reasonModal('Wydaj WARN', async reason => {
     await TabletApi.rpc('factionAction', { action: 'member_warn_add', citizenid: m.citizenid, reason });
