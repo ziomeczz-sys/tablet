@@ -1,0 +1,16 @@
+body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; color: #fff; }
+#tablet { width: 820px; height: 620px; border-radius: 30px; overflow: hidden; border: 10px solid #111; margin: 30px auto; background: linear-gradient(145deg, #243b55, #141e30); }
+.hidden { display: none !important; }
+.screen { width: 100%; height: 100%; padding: 20px; box-sizing: border-box; }
+#lockScreen { display: flex; align-items: center; justify-content: center; flex-direction: column; background: radial-gradient(circle at top, #457fca, #0d1a26); }
+.pin-pad { display: grid; grid-template-columns: repeat(3, 70px); gap: 12px; margin-top: 20px; }
+.pin-pad button, .apps button, .modal button, #closeBtn { border: 0; border-radius: 12px; padding: 10px 12px; background: rgba(255,255,255,0.15); color: #fff; cursor: pointer; }
+header { display: flex; justify-content: space-between; align-items: center; }
+.apps { display: flex; gap: 12px; margin: 20px 0; }
+#content { background: rgba(0,0,0,0.2); border-radius: 14px; padding: 12px; height: 460px; overflow: auto; }
+.table { width: 100%; border-collapse: collapse; }
+.table th, .table td { border-bottom: 1px solid rgba(255,255,255,0.1); padding: 8px; text-align: left; font-size: 13px; }
+.dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
+.dot.online { background: #2ecc71; }
+.dot.offline { background: #95a5a6; }
+input, select, textarea { width: 100%; padding: 8px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.2); background: rgba(0,0,0,0.2); color: #fff; margin-bottom: 8px; }

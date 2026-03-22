@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>QBCore Tablet Pro</title>
+  <link rel="stylesheet" href="styles/base.css" />
+  <link rel="stylesheet" href="styles/ipad.css" />
+  <link rel="stylesheet" href="styles/components.css" />
+</head>
+<body>
+  <div id="app" class="hidden">
+    <div class="tablet-shell">
+      <div class="tablet-camera"></div>
+      <div class="tablet-screen">
+        <section id="lockScreen" class="view"></section>
+        <section id="setupScreen" class="view hidden"></section>
+        <section id="homeScreen" class="view hidden">
+          <header class="topbar">
+            <div>
+              <h2>Tablet LSPD</h2>
+              <small id="identityText"></small>
+            </div>
+            <button id="closeBtn" class="btn danger">Zamknij</button>
+          </header>
+
+          <main class="main-grid" id="mainGrid">
+            <aside class="app-grid">
+              <button class="app-btn" id="appFaction"><span class="app-icon">⚑</span><span>Moja Frakcja</span></button>
+              <button class="app-btn" id="appFamily"><span class="app-icon">👥</span><span>Moja Rodzina</span></button>
+            </aside>
+            <section id="contentArea" class="content"></section>
+          </main>
+        </section>
+      </div>
+    </div>
+  </div>
+
+  <div id="modal" class="modal hidden">
+    <div class="card">
+      <h3 id="modalTitle"></h3>
+      <div id="modalBody"></div>
+      <div class="row end">
+        <button id="modalCancel" class="btn ghost">Cofnij</button>
+        <button id="modalConfirm" class="btn">Wykonaj</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/api.js"></script>
+  <script src="js/render.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
